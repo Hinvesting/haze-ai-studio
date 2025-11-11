@@ -1,6 +1,6 @@
 import { configure, defineFlow, run } from '@genkit-ai/core';
 import { googleAI } from '@genkit-ai/google-genai';
-import { perplexity } from 'genkitx-perplexity';
+import Perplexity from '@perplexity-ai/perplexity_ai';
 import { anthropic } from 'genkitx-anthropic';
 import * as z from 'zod';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,7 +25,6 @@ async function getPrompt(promptId: string): Promise<string> {
 configure({
   plugins: [
     googleAI({ apiKey: process.env.GOOGLE_API_KEY }),
-    perplexity({ apiKey: process.env.PERPLEXITY_API_KEY }),
     anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
   ],
   logLevel: 'debug',
@@ -40,18 +39,18 @@ export const getTodayTopic = defineFlow(
   },
   async () => {
     const prompt = await getPrompt('P-01: [CHANNEL MANAGER]');
+    const perplexity = new Perplexity({ apiKey: process.env.PERPLEXITY_API_KEY });
 
-    const llmResponse = await run('call-perplexity', () =>
-      perplexity.generate({
+    const topic = await run('call-perplexity', async () => {
+      const response = await perplexity.chat.completions.create({
         model: 'llama-3-sonar-large-32k-online',
-        prompt,
-        output: {
-          format: 'text'
-        }
-      })
-    );
-
-    const topic = llmResponse.text();
+        messages: [
+          { role: 'user', content: prompt },
+        ],
+      });
+      return response.choices[0].message.content;
+    });
+    
     // Simplified parsing for the topic.
     const match = topic.match(/HIGH PRIORITY.*\n1\. \[(.+)\]/);
     return match ? match[1] : 'No topic found';
