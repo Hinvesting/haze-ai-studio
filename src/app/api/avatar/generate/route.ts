@@ -20,8 +20,7 @@ export async function POST(request: Request) {
         const stylingPrompt = await getPrompt('P-03: [SCENE/STUDIO DESIGNER]');
 
         const imageResponse = await run('call-google-avatar', () =>
-            googleAI.generate({
-                model: 'gemini-1.5-flash',
+            googleAI.model('gemini-1.5-flash').generate({
                 prompt: `${stylingPrompt}\n\nCreate an avatar with the following description: ${prompt}`,
                 output: {
                     format: 'text'
@@ -32,7 +31,7 @@ export async function POST(request: Request) {
         const imageUrl = imageResponse.text();
 
         return NextResponse.json({ imageUrl });
-    } catch (error) {
+    } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

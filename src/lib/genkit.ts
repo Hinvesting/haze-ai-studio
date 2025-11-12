@@ -83,8 +83,7 @@ export const generateStoryboard = defineFlow(
 
     // Step 2: Call Gemini API to get the structured JSON
     const jsonResponse = await run('call-gemini', () =>
-        googleAI.generate({
-            model: 'gemini-1.5-flash',
+        googleAI.model('gemini-1.5-flash').generate({
             prompt: `${sceneDesignerPrompt}\n\nScript:\n${script}`,
             output: {
                 format: 'json'
@@ -148,8 +147,7 @@ export const generateSceneImage = defineFlow(
 
 
       const imageResponse = await run('call-google-image', () =>
-        googleAI.generate({
-          model: 'gemini-1.5-flash',
+        googleAI.model('gemini-1.5-flash').generate({
           prompt: prompt,
           output: {
               format: 'text' // Assuming the API returns a URL in text format
