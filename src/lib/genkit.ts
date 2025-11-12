@@ -43,7 +43,7 @@ export const getTodayTopic = defineFlow(
 
     const topic = await run('call-perplexity', async () => {
       const response = await perplexity.chat.completions.create({
-        model: 'llama-3-sonar-large-32k-online',
+        model: 'sonar',
         messages: [
           { role: 'user', content: prompt },
         ],
@@ -83,7 +83,7 @@ export const generateStoryboard = defineFlow(
 
     // Step 2: Call Gemini API to get the structured JSON
     const jsonResponse = await run('call-gemini', () =>
-        googleAI.model('gemini-1.5-flash').generate({
+        googleAI.model('gemini-2.5-flash').generate({
             prompt: `${sceneDesignerPrompt}\n\nScript:\n${script}`,
             output: {
                 format: 'json'
@@ -147,7 +147,7 @@ export const generateSceneImage = defineFlow(
 
 
       const imageResponse = await run('call-google-image', () =>
-        googleAI.model('gemini-1.5-flash').generate({
+        googleAI.model('gemini-2.5-flash').generate({
           prompt: prompt,
           output: {
               format: 'text' // Assuming the API returns a URL in text format
